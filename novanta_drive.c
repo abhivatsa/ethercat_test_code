@@ -92,10 +92,12 @@ static struct
     unsigned int statusword;
     unsigned int position_actual_value;
     unsigned int velocity_actual_value;
+    unsigned int torque_actual_value;
     unsigned int controlword;
     unsigned int modes_of_operation;
     unsigned int target_position;
     unsigned int target_velocity;
+    unsigned int target_torque;
 } offset, offset1, offset2;
 
 // /** List record type for PDO entry mass-registration.
@@ -123,81 +125,34 @@ const static ec_pdo_entry_reg_t domain1_regs[] = {
     {denalli_xcr_pos0, denalli_xcr, 0x6041, 0, &offset.statusword},             // 6041 0 statusword
     {denalli_xcr_pos0, denalli_xcr, 0x6064, 0, &offset.position_actual_value},  // 6064 0 pos_act_val
     {denalli_xcr_pos0, denalli_xcr, 0x606C, 0, &offset.velocity_actual_value},  // 606C 0 vel_act_val
+    {denalli_xcr_pos0, denalli_xcr, 0x6077, 0, &offset.torque_actual_value},    // 6077 0 torq_act_val
     {denalli_xcr_pos0, denalli_xcr, 0x6040, 0, &offset.controlword},            // 6040 0 control word
     {denalli_xcr_pos0, denalli_xcr, 0x6060, 0, &offset.modes_of_operation},     // 6060 0 mode_of_operation
     {denalli_xcr_pos0, denalli_xcr, 0x607A, 0, &offset.target_position},        // 607A 0 target position
     {denalli_xcr_pos0, denalli_xcr, 0x60FF, 0, &offset.target_velocity},        // 60FF 0 target velocity
-    // // --------------------- denalli_xcr_pos1 ------------------------ 
-    // {denalli_xcr_pos1, denalli_xcr, 0x6041, 0, &offset1.statusword},            // 6041 0 statusword
-    // {denalli_xcr_pos1, denalli_xcr, 0x6064, 0, &offset1.position_actual_value}, // 6064 0 pos_act_val
-    // {denalli_xcr_pos1, denalli_xcr, 0x606C, 0, &offset1.velocity_actual_value}, // 606C 0 vel_act_val
-    // {denalli_xcr_pos1, denalli_xcr, 0x6040, 0, &offset1.controlword},           // 6040 0 control word
-    // {denalli_xcr_pos1, denalli_xcr, 0x6060, 0, &offset1.modes_of_operation},    // 6060 0 mode_of_operation
-    // {denalli_xcr_pos1, denalli_xcr, 0x607A, 0, &offset1.target_position},       // 607A 0 target position
-    // {denalli_xcr_pos1, denalli_xcr, 0x60FF, 0, &offset1.target_velocity},       // 60FF 0 target velocity
-    // // --------------------- denalli_xcr_pos2 ------------------------ 
-    // {denalli_xcr_pos2, denalli_xcr, 0x6041, 0, &offset2.statusword},            // 6041 0 statusword
-    // {denalli_xcr_pos2, denalli_xcr, 0x6064, 0, &offset2.position_actual_value}, // 6064 0 pos_act_val
-    // {denalli_xcr_pos2, denalli_xcr, 0x606C, 0, &offset2.velocity_actual_value}, // 606C 0 vel_act_val
-    // {denalli_xcr_pos2, denalli_xcr, 0x6040, 0, &offset2.controlword},           // 6040 0 control word
-    // {denalli_xcr_pos2, denalli_xcr, 0x6060, 0, &offset2.modes_of_operation},    // 6060 0 mode_of_operation
-    // {denalli_xcr_pos2, denalli_xcr, 0x607A, 0, &offset2.target_position},       // 607A 0 target position
-    // {denalli_xcr_pos2, denalli_xcr, 0x60FF, 0, &offset2.target_velocity},       // 60FF 0 target velocity
+    {denalli_xcr_pos0, denalli_xcr, 0x6071, 0, &offset.target_torque},          // 6071 0 target torque
+    // --------------------- denalli_xcr_pos1 ------------------------ 
+    {denalli_xcr_pos1, denalli_xcr, 0x6041, 0, &offset1.statusword},             // 6041 0 statusword
+    {denalli_xcr_pos1, denalli_xcr, 0x6064, 0, &offset1.position_actual_value},  // 6064 0 pos_act_val
+    {denalli_xcr_pos1, denalli_xcr, 0x606C, 0, &offset1.velocity_actual_value},  // 606C 0 vel_act_val
+    {denalli_xcr_pos1, denalli_xcr, 0x6077, 0, &offset1.torque_actual_value},    // 6077 0 torq_act_val
+    {denalli_xcr_pos1, denalli_xcr, 0x6040, 0, &offset1.controlword},            // 6040 0 control word
+    {denalli_xcr_pos1, denalli_xcr, 0x6060, 0, &offset1.modes_of_operation},     // 6060 0 mode_of_operation
+    {denalli_xcr_pos1, denalli_xcr, 0x607A, 0, &offset1.target_position},        // 607A 0 target position
+    {denalli_xcr_pos1, denalli_xcr, 0x60FF, 0, &offset1.target_velocity},        // 60FF 0 target velocity
+    {denalli_xcr_pos1, denalli_xcr, 0x6071, 0, &offset1.target_torque},          // 6071 0 target torque
+    // --------------------- denalli_xcr_pos2 ------------------------ 
+    {denalli_xcr_pos2, denalli_xcr, 0x6041, 0, &offset2.statusword},             // 6041 0 statusword
+    {denalli_xcr_pos2, denalli_xcr, 0x6064, 0, &offset2.position_actual_value},  // 6064 0 pos_act_val
+    {denalli_xcr_pos2, denalli_xcr, 0x606C, 0, &offset2.velocity_actual_value},  // 606C 0 vel_act_val
+    {denalli_xcr_pos2, denalli_xcr, 0x6077, 0, &offset2.torque_actual_value},    // 6077 0 torq_act_val
+    {denalli_xcr_pos2, denalli_xcr, 0x6040, 0, &offset2.controlword},            // 6040 0 control word
+    {denalli_xcr_pos2, denalli_xcr, 0x6060, 0, &offset2.modes_of_operation},     // 6060 0 mode_of_operation
+    {denalli_xcr_pos2, denalli_xcr, 0x607A, 0, &offset2.target_position},        // 607A 0 target position
+    {denalli_xcr_pos2, denalli_xcr, 0x60FF, 0, &offset2.target_velocity},        // 60FF 0 target velocity
+    {denalli_xcr_pos2, denalli_xcr, 0x6071, 0, &offset2.target_torque},          // 6071 0 target torque
     {}
 };
-
-ec_pdo_entry_info_t slave_0_rec_pdo_channel1[] = {
-        {0x6040, 0x00, 16}, /* Controlword */
-        {0x607a, 0x00, 32}, /* Position set Point */
-        {0x60ff, 0x00, 32}, /* Velocity set point */
-        {0x6060, 0x00, 8}, /* Velocity set point */
-    };
-
-    ec_pdo_entry_info_t slave_0_rec_pdo_channel2[] = {
-        {0x6071, 0x00, 16}, /* Target Torque */
-    };
-
-    ec_pdo_entry_info_t slave_0_rec_pdo_channel3[] = {
-    };
-
-    ec_pdo_info_t slave_0_rec_pdos[] = {
-        {0x1600, 4, slave_0_rec_pdo_channel1},
-        {0x1601, 1, slave_0_rec_pdo_channel2},
-        {0x1602, 1, slave_0_rec_pdo_channel3},
-    };
-
-    ec_pdo_entry_info_t slave_0_trans_pdo_channel1[] = {
-        {0x6041, 0x00, 16}, /* Statusword */
-        {0x6064, 0x00, 32}, /* Actual Position */
-        {0x606C, 0x00, 32}, /* Actual Velocity */
-        {0x6061, 0x00, 8}, /* Operation Mode display */
-    };
-
-    ec_pdo_entry_info_t slave_0_trans_pdo_channel2[] = {
-        // {0x6077, 0x00, 16}, /* Actual Torque */
-        // {0x6078, 0x00, 16}, /* Actual Current */
-    };
-
-    ec_pdo_entry_info_t slave_0_trans_pdo_channel3[] = {
-        // {0x607B, 0x01, 32}, /* min pos limit */
-        // {0x607B, 0x02, 32}, /* max pos limit */
-    };
-
-    ec_pdo_info_t slave_0_trans_pdos[] = {
-        {0x1A00, 4, slave_0_trans_pdo_channel1},
-        {0x1A01, 2, slave_0_trans_pdo_channel2},
-        {0x1A02, 2, slave_0_trans_pdo_channel3},
-    };
-
-    ec_sync_info_t slave_0_pdo_syncs[] = {
-        {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
-        {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
-        {2, EC_DIR_OUTPUT, 3, slave_0_rec_pdos, EC_WD_ENABLE},
-        {3, EC_DIR_INPUT, 3, slave_0_trans_pdos, EC_WD_DISABLE},
-        {0xff}
-    };
-
-
 
 /*****************************************************************************/
 
@@ -247,24 +202,24 @@ void check_master_state(void)
 
 /*****************************************************************************/
 
-uint16_t update_state(uint16_t status, uint16_t command)
+uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
 {
     if ( ((status | 65456) ^ 65456) == 0 ){
-        printf("Not ready to switch on \n");
+        // printf("Not ready to switch on \n");
         // Not ready to switch on
     }
     else if ( ((status | 65456) ^ 65520 ) == 0 && command != 6){
-        printf("Switch on Disabled \n");
+        printf("Drive %d Switch on Disabled \n", joint_num);
         // Switch on Disabled
         command = 6;
     }
     else if ( ((status | 65424) ^ 65457) == 0 && command != 7){
-        printf("Ready to Switch on \n");
+        printf("Drive %d Ready to Switch on \n", joint_num);
         // Ready to Switch on
         command = 7;
     }
     else if ( ((status | 65424) ^ 65459) == 0 && command != 15){
-        printf(" Switched On \n");
+        printf("Drive %d Switched On \n", joint_num);
         // Switched On
         command = 15;
     }
@@ -342,8 +297,8 @@ void cyclic_task()
     // short act_torq;
 
     status = EC_READ_U16(domain1_pd + offset.statusword);
-    // status1 = EC_READ_U16(domain1_pd + offset1.statusword);
-    // status2 = EC_READ_U16(domain1_pd + offset2.statusword);
+    status1 = EC_READ_U16(domain1_pd + offset1.statusword);
+    status2 = EC_READ_U16(domain1_pd + offset2.statusword);
 
     act_pos = EC_READ_S32(domain1_pd + offset.position_actual_value);
     // act_pos1 = EC_READ_S32(domain1_pd + offset1.position_actual_value);
@@ -354,7 +309,7 @@ void cyclic_task()
 
     // printf(" status : %d, pos_value: %d \n", status, act_pos);
 
-    command = update_state(status, command);
+    command = update_state(status, command, 0);
     // EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 1);
 
     EC_WRITE_U16(domain1_pd + offset.controlword, command);
@@ -368,9 +323,9 @@ void cyclic_task()
 
     // printf(" status1 : %d, pos_value: %d \n", status1, act_pos1);
 
-    // command1 = update_state(status1, command1);
+    command1 = update_state(status1, command1, 1);
 
-    // EC_WRITE_U16(domain1_pd + offset1.controlword, command1);
+    EC_WRITE_U16(domain1_pd + offset1.controlword, command1);
 
     // if ( ((status1 | 65424) ^ 65463) == 0 ){
     //     EC_WRITE_S8(domain1_pd + offset1.modes_of_operation, 1);
@@ -381,9 +336,9 @@ void cyclic_task()
 
     // printf(" status2 : %d, pos_value: %d \n", status2, act_pos2);
 
-    // command2 = update_state(status2, command2);
+    command2 = update_state(status2, command2, 2);
 
-    // EC_WRITE_U16(domain1_pd + offset2.controlword, command2);
+    EC_WRITE_U16(domain1_pd + offset2.controlword, command2);
 
     // if ( ((status2 | 65424) ^ 65463) == 0 ){
     //     EC_WRITE_S8(domain1_pd + offset2.modes_of_operation, 1);
@@ -401,6 +356,46 @@ void stack_prefault(void)
     unsigned char dummy[MAX_SAFE_STACK];
 
     memset(dummy, 0, MAX_SAFE_STACK);
+}
+
+/****************************************************************************/
+void pdo_mapping(ec_slave_config_t *sc)
+{
+    /* Define RxPdo */
+
+    ecrt_slave_config_pdo_assign_clear(sc, 2);
+
+    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1600);
+    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1601);
+    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1602);
+
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1600);
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1601);
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1602);
+
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6040, 0, 16); /* 0x6040:0/16bits, control word */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x607a, 0, 32); /* 0x607a:0/32bits, Position set Point */
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x60ff, 0, 32); /* 0x60ff:0/32bits, Velocity set point */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6071, 0, 16); /* 0x6071:0/16bits, Target Torque */  
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6060, 0, 8); /* 0x6060:0/8bits, mode_of_operation */ 
+
+    /* Define TxPdo */
+
+    ecrt_slave_config_pdo_assign_clear(sc, 3);
+
+    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A00);
+    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A01);
+    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A02);
+
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A00);
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A01);
+    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A02);
+
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6041, 0, 16); /* 0x6041:0/16bits, Statusword */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6064, 0, 32); /* 0x6064:0/32bits, Actual Position */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x606C, 0, 32); /* 0x606C:0/32bits, Actual Velocity */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6077, 0, 16); /* 0x6077:0/16bits, Torque Actual Value */ 
+
 }
 
 /****************************************************************************/
@@ -446,120 +441,25 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    /* Configure Denalli XCR Drive 1 PDO */
-    printf("Configuring Denalli XCR Drive 1 PDO...\n");
+    pdo_mapping(sc);
 
-    /* *********************** Clear RxPdo Drive 1 **************************** */
+    if (!(sc = ecrt_master_slave_config(
+              master, denalli_xcr_pos1, denalli_xcr)))
+    {
+        fprintf(stderr, "Failed to get slave configuration.\n");
+        return -1;
+    }
 
-    // /** Add a configuration value for an 8-bit SDO.
-    //  *
-    //  * This method has to be called in non-realtime context before
-    //  * ecrt_master_activate().
-    //  *
-    //  * \see ecrt_slave_config_sdo().
-    //  *
-    //  * \retval  0 Success.
-    //  * \retval <0 Error code.
-    //  */
-    // int ecrt_slave_config_sdo8(
-    //         ec_slave_config_t *sc, /**< Slave configuration */
-    //         uint16_t sdo_index, /**< Index of the SDO to configure. */
-    //         uint8_t sdo_subindex, /**< Subindex of the SDO to configure. */
-    //         uint8_t value /**< Value to set. */
-    //         );
+    pdo_mapping(sc);
 
+    if (!(sc = ecrt_master_slave_config(
+              master, denalli_xcr_pos2, denalli_xcr)))
+    {
+        fprintf(stderr, "Failed to get slave configuration.\n");
+        return -1;
+    }
 
-    // ec_pdo_info_t slave_0_rec_pdos[] = {
-    //     {0x1600, 4, slave_0_rec_pdo_channel1},
-    //     {0x1601, 2, slave_0_rec_pdo_channel2},
-    //     {0x1602, 2, slave_0_rec_pdo_channel3},
-    // };
-
-    // /** Add a configuration value for a 32-bit SDO.
-    //  * 
-    //  * This method has to be called in non-realtime context before
-    //  * ecrt_master_activate().
-    //  *
-    //  * \see ecrt_slave_config_sdo().
-    //  *
-    //  * \retval  0 Success.
-    //  * \retval <0 Error code.
-    //  */
-    // int ecrt_slave_config_sdo32(
-    //         ec_slave_config_t *sc, /**< Slave configuration */
-    //         uint16_t sdo_index, /**< Index of the SDO to configure. */
-    //         uint8_t sdo_subindex, /**< Subindex of the SDO to configure. */
-    //         uint32_t value /**< Value to set. */
-    //         );
-
-    // {denalli_xcr_pos0, denalli_xcr, 0x6041, 0, &offset.statusword},             // 6041 0 statusword
-    // {denalli_xcr_pos0, denalli_xcr, 0x6064, 0, &offset.position_actual_value},  // 6064 0 pos_act_val
-    // {denalli_xcr_pos0, denalli_xcr, 0x606C, 0, &offset.velocity_actual_value},  // 606C 0 vel_act_val
-    // {denalli_xcr_pos0, denalli_xcr, 0x6040, 0, &offset.controlword},            // 6040 0 control word
-    // {denalli_xcr_pos0, denalli_xcr, 0x6060, 0, &offset.modes_of_operation},     // 6060 0 mode_of_operation
-    // {denalli_xcr_pos0, denalli_xcr, 0x607A, 0, &offset.target_position},        // 607A 0 target position
-    // {denalli_xcr_pos0, denalli_xcr, 0x60FF, 0, &offset.target_velocity},        // 60FF 0 target velocity
-
-
-    /* Define RxPdo */
-
-    ecrt_slave_config_pdo_assign_clear(sc, 2);
-
-    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1600);
-    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1601);
-    ecrt_slave_config_pdo_assign_add(sc, 2, 0x1602);
-
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1600);
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1601);
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1602);
-
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6040, 0, 16); /* 0x6040:0/16bits, control word */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x607a, 0, 32); /* 0x607a:0/32bits, Position set Point */
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x60ff, 0, 32); /* 0x60ff:0/32bits, Velocity set point */  
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6060, 0, 8); /* 0x6060:0/8bits, mode_of_operation */ 
-
-    /* Define TxPdo */
-
-    ecrt_slave_config_pdo_assign_clear(sc, 3);
-
-    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A00);
-    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A01);
-    ecrt_slave_config_pdo_assign_add(sc, 3, 0x1A02);
-
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A00);
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A01);
-    ecrt_slave_config_pdo_mapping_clear(sc, 0x1A02);
-
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6041, 0, 16); /* 0x6041:0/16bits, Statusword */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6064, 0, 32); /* 0x6064:0/32bits, Actual Position */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x606C, 0, 32); /* 0x606C:0/32bits, Actual Velocity */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6061, 0, 8); /* 0x6061:0/8bits, Operation Mode display */
-
-    // if (!(sc = ecrt_master_slave_config(
-    //           master, denalli_xcr_pos1, denalli_xcr)))
-    // {
-    //     fprintf(stderr, "Failed to get slave configuration.\n");
-    //     return -1;
-    // }
-
-    // if (ecrt_slave_config_pdos(sc, EC_END, slave_1_pdo_syncs))
-    // {
-    //     fprintf(stderr, "Failed to configure PDOs.\n");
-    //     return -1;
-    // }
-
-    // if (!(sc = ecrt_master_slave_config(
-    //           master, denalli_xcr_pos2, denalli_xcr)))
-    // {
-    //     fprintf(stderr, "Failed to get slave configuration.\n");
-    //     return -1;
-    // }
-
-    // if (ecrt_slave_config_pdos(sc, EC_END, slave_2_pdo_syncs))
-    // {
-    //     fprintf(stderr, "Failed to configure PDOs.\n");
-    //     return -1;
-    // }
+    pdo_mapping(sc);
 
     // sleep(100);
 
