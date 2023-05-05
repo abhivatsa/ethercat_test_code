@@ -45,6 +45,8 @@ sudo cp /opt/etherlab/etc/sysconfig/ethercat /etc/sysconfig/ethercat
 
 sudo gedit /etc/sysconfig/ethercat
 
+echo KERNEL==\"EtherCAT[0-9]*\", MODE=\"0664\" > /etc/udev/rules.d/99-EtherCAT.rules
+
 sudo /etc/init.d/ethercat restart
 
 ```
