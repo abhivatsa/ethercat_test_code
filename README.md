@@ -14,3 +14,5 @@ sudo ln -s /opt/etherlab/etc/init.d/ethercat /etc/init.d/ethercat
 sudo cp /opt/etherlab/etc/sysconfig/ethercat /etc/sysconfig/ethercat
 
 sudo gedit /etc/sysconfig/ethercat
+
+sudo gcc novanta_drive.c -I/usr/local/include -Wall /usr/local/lib/libethercat.a
