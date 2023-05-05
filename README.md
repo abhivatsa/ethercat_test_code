@@ -1,4 +1,23 @@
 # Ethercat_code
+
+### Linux kernel change
+Download all the relative files from the selected kernel
+
+```
+https://kernel.ubuntu.com/~kernel-ppa/mainline/
+```
+Install Libssl 1.1
+```
+wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+sudo dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+```
+Install kernel  
+```
+sudo dpkg -i *.deb
+```
+
+
+
 Ethercat code for running novanta and Synapticon drives
 
 ./configure --disable-8139too --enable-sii-assign --disable-8139too --enable-hrtimer --enable-cycles --enable-e1000e --prefix="/opt/etherlab" --disable-eoe
