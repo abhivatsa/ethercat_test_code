@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "shm.h": "c",
+        "resource.h": "c"
+    }
+}
