@@ -155,61 +155,36 @@ static struct
 const static ec_pdo_entry_reg_t domain1_regs[] = {
     // --------------------- denalli_xcr_pos0 ------------------------ 
     {denalli_xcr_pos0, denalli_xcr, 0x6041, 0, &offset.statusword},             // 6041 0 statusword
-    {denalli_xcr_pos0, denalli_xcr, 0x2030, 0, &offset.position_actual_value},  // 6064 0 pos_act_val
+    {denalli_xcr_pos0, denalli_xcr, 0x6064, 0, &offset.position_actual_value},  // 6064 0 pos_act_val
     // {denalli_xcr_pos0, denalli_xcr, 0x606C, 0, &offset.velocity_actual_value},  // 606C 0 vel_act_val
     {denalli_xcr_pos0, denalli_xcr, 0x6077, 0, &offset.torque_actual_value},    // 6077 0 torq_act_val
     {denalli_xcr_pos0, denalli_xcr, 0x6040, 0, &offset.controlword},            // 6040 0 control word
     {denalli_xcr_pos0, denalli_xcr, 0x6060, 0, &offset.modes_of_operation},     // 6060 0 mode_of_operation
-    {denalli_xcr_pos0, denalli_xcr, 0x2020, 0, &offset.target_position},        // 607A 0 target position
+    {denalli_xcr_pos0, denalli_xcr, 0x607A, 0, &offset.target_position},        // 607A 0 target position
     // {denalli_xcr_pos0, denalli_xcr, 0x60FF, 0, &offset.target_velocity},        // 60FF 0 target velocity
     // {denalli_xcr_pos0, denalli_xcr, 0x6071, 0, &offset.target_torque},          // 6071 0 target torque
     // --------------------- denalli_xcr_pos1 ------------------------ 
     {denalli_xcr_pos1, denalli_xcr, 0x6041, 0, &offset1.statusword},             // 6041 0 statusword
-    {denalli_xcr_pos1, denalli_xcr, 0x2030, 0, &offset1.position_actual_value},  // 6064 0 pos_act_val
+    {denalli_xcr_pos1, denalli_xcr, 0x6064, 0, &offset1.position_actual_value},  // 6064 0 pos_act_val
     // {denalli_xcr_pos1, denalli_xcr, 0x606C, 0, &offset1.velocity_actual_value},  // 606C 0 vel_act_val
     {denalli_xcr_pos1, denalli_xcr, 0x6077, 0, &offset1.torque_actual_value},    // 6077 0 torq_act_val
     {denalli_xcr_pos1, denalli_xcr, 0x6040, 0, &offset1.controlword},            // 6040 0 control word
     {denalli_xcr_pos1, denalli_xcr, 0x6060, 0, &offset1.modes_of_operation},     // 6060 0 mode_of_operation
-    {denalli_xcr_pos1, denalli_xcr, 0x2020, 0, &offset1.target_position},        // 607A 0 target position
+    {denalli_xcr_pos1, denalli_xcr, 0x607A, 0, &offset1.target_position},        // 607A 0 target position
     // {denalli_xcr_pos1, denalli_xcr, 0x60FF, 0, &offset1.target_velocity},        // 60FF 0 target velocity
     // {denalli_xcr_pos1, denalli_xcr, 0x6071, 0, &offset1.target_torque},          // 6071 0 target torque
     // --------------------- denalli_xcr_pos2 ------------------------ 
     {denalli_xcr_pos2, denalli_xcr, 0x6041, 0, &offset2.statusword},             // 6041 0 statusword
-    {denalli_xcr_pos2, denalli_xcr, 0x2030, 0, &offset2.position_actual_value},  // 6064 0 pos_act_val
+    {denalli_xcr_pos2, denalli_xcr, 0x6064, 0, &offset2.position_actual_value},  // 6064 0 pos_act_val
     // {denalli_xcr_pos2, denalli_xcr, 0x606C, 0, &offset2.velocity_actual_value},  // 606C 0 vel_act_val
     {denalli_xcr_pos2, denalli_xcr, 0x6077, 0, &offset2.torque_actual_value},    // 6077 0 torq_act_val
     {denalli_xcr_pos2, denalli_xcr, 0x6040, 0, &offset2.controlword},            // 6040 0 control word
     {denalli_xcr_pos2, denalli_xcr, 0x6060, 0, &offset2.modes_of_operation},     // 6060 0 mode_of_operation
-    {denalli_xcr_pos2, denalli_xcr, 0x2020, 0, &offset2.target_position},        // 607A 0 target position
+    {denalli_xcr_pos2, denalli_xcr, 0x607A, 0, &offset2.target_position},        // 607A 0 target position
     // {denalli_xcr_pos2, denalli_xcr, 0x60FF, 0, &offset2.target_velocity},        // 60FF 0 target velocity
     // {denalli_xcr_pos2, denalli_xcr, 0x6071, 0, &offset2.target_torque},          // 6071 0 target torque
     {}
 };
-
-// const static ec_pdo_entry_reg_t domain1_regs[] = {
-//     // --------------------- denalli_xcr_pos0 ------------------------ 
-//     {denalli_xcr_pos0, denalli_xcr, 0x6041, 0, &offset.statusword},             // 6041 0 statusword
-//     {denalli_xcr_pos0, denalli_xcr, 0x2030, 0, &offset.position_actual_value},  // 6064 0 pos_act_val
-//     {denalli_xcr_pos0, denalli_xcr, 0x6077, 0, &offset.torque_actual_value},    // 6077 0 torq_act_val
-//     {denalli_xcr_pos0, denalli_xcr, 0x6040, 0, &offset.controlword},            // 6040 0 control word
-//     {denalli_xcr_pos0, denalli_xcr, 0x6060, 0, &offset.modes_of_operation},     // 6060 0 mode_of_operation
-//     {denalli_xcr_pos0, denalli_xcr, 0x2020, 0, &offset.target_position},        // 607A 0 target position
-//     // --------------------- denalli_xcr_pos1 ------------------------ 
-//     {denalli_xcr_pos1, denalli_xcr, 0x6041, 0, &offset.statusword1},             // 6041 0 statusword
-//     {denalli_xcr_pos1, denalli_xcr, 0x2030, 0, &offset.position_actual_value1},  // 6064 0 pos_act_val
-//     {denalli_xcr_pos1, denalli_xcr, 0x6077, 0, &offset.torque_actual_value1},    // 6077 0 torq_act_val
-//     {denalli_xcr_pos1, denalli_xcr, 0x6040, 0, &offset.controlword1},            // 6040 0 control word
-//     {denalli_xcr_pos1, denalli_xcr, 0x6060, 0, &offset.modes_of_operation1},     // 6060 0 mode_of_operation
-//     {denalli_xcr_pos1, denalli_xcr, 0x2020, 0, &offset.target_position1},        // 607A 0 target position
-//     // --------------------- denalli_xcr_pos2 ------------------------ 
-//     {denalli_xcr_pos2, denalli_xcr, 0x6041, 0, &offset.statusword2},             // 6041 0 statusword
-//     {denalli_xcr_pos2, denalli_xcr, 0x2030, 0, &offset.position_actual_value2},  // 6064 0 pos_act_val
-//     {denalli_xcr_pos2, denalli_xcr, 0x6077, 0, &offset.torque_actual_value2},    // 6077 0 torq_act_val
-//     {denalli_xcr_pos2, denalli_xcr, 0x6040, 0, &offset.controlword2},            // 6040 0 control word
-//     {denalli_xcr_pos2, denalli_xcr, 0x6060, 0, &offset.modes_of_operation2},     // 6060 0 mode_of_operation
-//     {denalli_xcr_pos2, denalli_xcr, 0x2020, 0, &offset.target_position2},        // 607A 0 target position
-//     {}
-// };
 
 /*****************************************************************************/
 
@@ -474,8 +449,10 @@ void pdo_mapping(ec_slave_config_t *sc)
     ecrt_slave_config_pdo_mapping_clear(sc, 0x1602);
 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6040, 0, 16); /* 0x6040:0/16bits, control word */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x2020, 0, 32); /* 0x607a:0/32bits, Position set Point */
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x607A, 0, 32); /* 0x607a:0/32bits, Position set Point */
     ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6060, 0, 8); /* 0x6060:0/8bits, mode_of_operation */ 
+
+    // ecrt_slave_config_pdo_mapping_add(sc, 0x1601, 0x60FF, 0, 32); /* 0x60FF:0/32bits, target_velocity */ 
 
     /* Define TxPdo */
 
@@ -490,8 +467,10 @@ void pdo_mapping(ec_slave_config_t *sc)
     ecrt_slave_config_pdo_mapping_clear(sc, 0x1A02);
 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6041, 0, 16); /* 0x6041:0/16bits, Statusword */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x2030, 0, 32); /* 0x6064:0/32bits, Actual Position */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6064, 0, 32); /* 0x6064:0/32bits, Actual Position */ 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6077, 0, 16); /* 0x6077:0/16bits, Torque Actual Value */ 
+
+    // ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x606C, 0, 32); /* 0x606C:0/32bits, velocity_actual_value */ 
 
     // ecrt_slave_config_pdo_assign_clear(sc, 2);
 
