@@ -237,7 +237,7 @@ void check_master_state(void)
 uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
 {
     if ( ((status | 65456) ^ 65456) == 0 ){
-        // printf("Not ready to switch on \n");
+        printf("Not ready to switch on \n");
         // Not ready to switch on
     }
     else if ( ((status | 65456) ^ 65520 ) == 0 && command != 6){
@@ -273,10 +273,10 @@ uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
         // printf("Line 430 status: %d, command : %d\n", status, command);
     }
 
-    // printf(" Switch on Disabled %d \n", ((status | 65456) ^ 65520 ) == 0);
-    // printf(" Ready to Switch on %d \n", ((status | 65424) ^ 65457) == 0);
-    // printf(" Switched On %d \n", ((status | 65424) ^ 65459) == 0 );
-    // printf(" Operation Enabled %d \n", ((status | 65424) ^ 65463) == 0 );
+    printf(" Switch on Disabled %d \n", ((status | 65456) ^ 65520 ) == 0);
+    printf(" Ready to Switch on %d \n", ((status | 65424) ^ 65457) == 0);
+    printf(" Switched On %d \n", ((status | 65424) ^ 65459) == 0 );
+    printf(" Operation Enabled %d \n", ((status | 65424) ^ 65463) == 0 );
 
     // printf("Line 246 status: %d, command : %d\n", status, command);
 
@@ -338,13 +338,13 @@ void cyclic_task()
     act_torq1 = EC_READ_S16(domain1_pd + offset1.torque_actual_value);
     act_torq2 = EC_READ_S16(domain1_pd + offset2.torque_actual_value);
 
-    data_ptr[0] = act_pos;
-    data_ptr[3] = act_pos1;
-    data_ptr[6] = act_pos2;
+    data_ptr[11] = act_pos;
+    data_ptr[14] = act_pos1;
+    data_ptr[17] = act_pos2;
 
-    data_ptr[1] = act_torq;
-    data_ptr[4] = act_torq1;
-    data_ptr[7] = act_torq2;
+    data_ptr[12] = act_torq;
+    data_ptr[16] = act_torq1;
+    data_ptr[18] = act_torq2;
 
     // ************ update status and command for 1st Drive ************
 
@@ -377,46 +377,35 @@ void cyclic_task()
 
     if (initialized_eth == false)
     {
-        EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 1);
-        EC_WRITE_S8(domain1_pd + offset1.modes_of_operation, 1);
-        EC_WRITE_S8(domain1_pd + offset2.modes_of_operation, 1);
-
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 1);
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation1, 1);
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation2, 1);
+        EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 8);
+        EC_WRITE_S8(domain1_pd + offset1.modes_of_operation, 8);
+        EC_WRITE_S8(domain1_pd + offset2.modes_of_operation, 8);
 
         if ( ((status | 65424) ^ 65463) == 0  && ((status1 | 65424) ^ 65463) == 0 && ((status2 | 65424) ^ 65463) == 0)
         {
             initialized_eth = true;
         }
 
-
-        data_ptr[2] = act_pos;
-        data_ptr[5] = act_pos1;
-        data_ptr[8] = act_pos2;
+        data_ptr[13] = act_pos;
+        data_ptr[16] = act_pos1;
+        data_ptr[19] = act_pos2;
 
     }
     else{
 
         printf("joint pos 1 : %d, joint pos 2 : %d, joint pos 3 : %d, \n", act_pos, act_pos1, act_pos2);
 
-        printf("data joint1 : %d \n", data_ptr[2]);
-        printf("data joint2 : %d \n", data_ptr[5]);
-        printf("data joint3 : %d \n", data_ptr[8]);
+        printf("data joint1 : %d \n", data_ptr[13]);
+        printf("data joint2 : %d \n", data_ptr[16]);
+        printf("data joint3 : %d \n", data_ptr[19]);
 
-        EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 1);
-        EC_WRITE_S8(domain1_pd + offset1.modes_of_operation, 1);
-        EC_WRITE_S8(domain1_pd + offset2.modes_of_operation, 1);
-        EC_WRITE_S32(domain1_pd + offset.target_position, data_ptr[2]);
-        EC_WRITE_S32(domain1_pd + offset1.target_position, data_ptr[5]);
-        EC_WRITE_S32(domain1_pd + offset2.target_position, data_ptr[8]);
+        EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 8);
+        EC_WRITE_S8(domain1_pd + offset1.modes_of_operation, 8);
+        EC_WRITE_S8(domain1_pd + offset2.modes_of_operation, 8);
+        EC_WRITE_S32(domain1_pd + offset.target_position, data_ptr[13]);
+        EC_WRITE_S32(domain1_pd + offset1.target_position, data_ptr[16]);
+        EC_WRITE_S32(domain1_pd + offset2.target_position, data_ptr[19]);
 
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation, 1);
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation1, 1);
-        // EC_WRITE_S8(domain1_pd + offset.modes_of_operation2, 1);
-        // EC_WRITE_S32(domain1_pd + offset.target_position, 100000);
-        // EC_WRITE_S32(domain1_pd + offset.target_position1, 100000);
-        // EC_WRITE_S32(domain1_pd + offset.target_position2, 100000);
 
     }
 
