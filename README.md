@@ -50,5 +50,10 @@ echo KERNEL==\"EtherCAT[0-9]*\", MODE=\"0664\" > /etc/udev/rules.d/99-EtherCAT.r
 sudo /etc/init.d/ethercat restart
 
 ```
-
-sudo gcc novanta_drive.c -I/usr/local/include -Wall /usr/local/lib/libethercat.a
+Command to build and run
+```
+sudo gcc novanta_drive_working.c -I/usr/local/include -Wall /usr/local/lib/libethercat.a -pthread -lrt
+sudo g++ sterile_engagement.cpp -pthread -lrt -o sterile_engagement
+sudo ./a.out
+sudo ./sterile_engagement
+```
