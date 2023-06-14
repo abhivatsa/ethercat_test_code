@@ -96,7 +96,7 @@ int main()
 
     while (instrument_attached == 1)
     {
-        instrument_attached = ptr1[8];
+        instrument_attached = ptr1[9];
     }
 
     std::cout<<"instrument_attached: "<<instrument_attached<<std::endl;

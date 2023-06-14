@@ -8,7 +8,7 @@ torq_data = data(:,6);
 
 a = 0.4;
 torq_data_new = zeros(length(torq_data),1);
-num = 20;
+num = 30;
 data_vec = zeros(num,1);
 
 for cnt =num:length(torq_data)-1

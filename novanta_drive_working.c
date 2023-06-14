@@ -290,13 +290,6 @@ uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
         // printf("Line 430 status: %d, command : %d\n", status, command);
     }
 
-    // printf(" Switch on Disabled %d \n", ((status | 65456) ^ 65520 ) == 0);
-    // printf(" Ready to Switch on %d \n", ((status | 65424) ^ 65457) == 0);
-    // printf(" Switched On %d \n", ((status | 65424) ^ 65459) == 0 );
-    // printf(" Operation Enabled %d \n", ((status | 65424) ^ 65463) == 0 );
-
-    // printf("Line 246 status: %d, command : %d\n", status, command);
-
     return command;
 }
 
@@ -362,6 +355,7 @@ void cyclic_task()
     dio2 = EC_READ_U32(domain_pd + offset2.digital_input_value);
 
     data_ptr[8] = dio0;
+    data_ptr[9] = dio1;
     data_ptr[10] = dio2;
 
     data_ptr[11] = act_pos;
@@ -528,8 +522,8 @@ void pdo_mapping(ec_slave_config_t *sc)
     ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x607A, 0, 32); /* 0x607a:0/32bits, Position set Point */
     ecrt_slave_config_pdo_mapping_add(sc, 0x1600, 0x6060, 0, 8); /* 0x6060:0/8bits, mode_of_operation */
 
-    // ecrt_slave_config_pdo_mapping_add(sc, 0x1601, 0x60FF, 0, 32); /* 0x60FF:0/32bits, target_velocity */ 
-    // ecrt_slave_config_pdo_mapping_add(sc, 0x1601, 0x6071, 0, 16); /* 0x6071:0/16bits, target torque */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1601, 0x60FF, 0, 32); /* 0x60FF:0/32bits, target_velocity */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1601, 0x6071, 0, 16); /* 0x6071:0/16bits, target torque */ 
 
     /* Define TxPdo */
 
@@ -548,9 +542,9 @@ void pdo_mapping(ec_slave_config_t *sc)
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x6077, 0, 16); /* 0x6077:0/16bits, Torque Actual Value */ 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x2600, 0, 32); /* 0x2600:0/32bits, Digital Input Value */ 
 
-    // ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x6078, 0, 16); /* 0x6077:0/16bits, Current actual value */ 
-    // ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x607C, 0, 32); /* 0x6077:0/16bits, Homing offset */ 
-    // ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x606C, 0, 32); /* 0x606C:0/32bits, velocity_actual_value */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x6078, 0, 16); /* 0x6077:0/16bits, Current actual value */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x607C, 0, 32); /* 0x6077:0/16bits, Homing offset */ 
+    ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x606C, 0, 32); /* 0x606C:0/32bits, velocity_actual_value */ 
 
 }
 

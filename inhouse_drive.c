@@ -203,6 +203,48 @@ const static ec_pdo_entry_reg_t domain_regs[] = {
     {}
 };
 
+ec_pdo_entry_info_t slave_3_pdo_entries[] = {
+    {0x7000, 0x01, 8}, /* Control_word */
+    {0x7000, 0x02, 8}, /* Header */
+    {0x7000, 0x03, 16}, /*  Used_hsptl_code */
+    {0x7000, 0x04, 8}, /* Number_of_usage */
+    {0x7000, 0x05, 8}, /* Last_used_Date */
+    {0x7000, 0x06, 8}, /* Last_used_Month */
+    {0x7000, 0x07, 8}, /* Last_used_Year */
+    {0x7000, 0x08, 8}, /* Last_used_Hour */
+    {0x6000, 0x01, 8}, /* Status_word */
+    {0x6000, 0x02, 8}, /* Header */
+    {0x6000, 0x03, 8}, /* Instrument_type */
+    {0x6000, 0x04, 8}, /* Usage_limit */
+    {0x6000, 0x05, 16}, /* Instrument_version */
+    {0x6000, 0x06, 8}, /* Mfg_Country_code */
+    {0x6000, 0x07, 8}, /* Mfg_Plant_code */
+    {0x6000, 0x08, 8}, /* Mfg_Date */
+    {0x6000, 0x09, 8}, /* Mfg_Month */
+    {0x6000, 0x10, 8}, /* Mfg_year */
+    {0x6000, 0x11, 8}, /* QC_Status */
+    {0x6000, 0x12, 16}, /*  Used_hsptl_code */
+    {0x6000, 0x13, 8}, /* Number_of_usage */
+    {0x6000, 0x14, 8}, /* Last_used_Date */
+    {0x6000, 0x15, 8}, /* Last_used_Month */
+    {0x6000, 0x16, 8}, /* Last_used_Year */
+    {0x6000, 0x17, 8}, /* Last_used_Hour */
+};
+
+ec_pdo_info_t slave_3_pdos[] = {
+    {0x1600, 8, slave_3_pdo_entries + 0}, /* Output mapping 0 */
+    {0x1a00, 17, slave_3_pdo_entries + 8}, /* Input mapping 0 */
+};
+
+ec_sync_info_t slave_3_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 1, slave_3_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 1, slave_3_pdos + 1, EC_WD_DISABLE},
+    {0xff}
+};
+
+
 /*****************************************************************************/
 
 void check_domain_state(void)
@@ -247,36 +289,6 @@ void check_master_state(void)
     printf("Line 279 \n");
 
     master_state = ms;
-}
-
-/*****************************************************************************/
-
-uint16_t make_ready_state(uint16_t status, uint16_t command, int joint_num)
-{
-    if ( ((status | 65456) ^ 65456) == 0 ){
-        printf("Not ready to switch on \n");
-        // Not ready to switch on
-    }
-    else if ( ((status | 65456) ^ 65520 ) == 0 && command != 6){
-        printf("Drive %d Switch on Disabled \n", joint_num);
-        // Switch on Disabled
-        command = 6;
-    }
-    else if ( ((status | 65424) ^ 65457) == 0 && command != 7){
-        // Ready to Switch on
-    }
-    else if ( ((status | 65456) ^ 65471) == 0){
-        // Fault Reaction Active
-    }
-    else if ( ((status | 65456) ^ 65464) == 0 && command != 128){
-        // Fault
-        command = 128;
-    }
-    else{
-        // printf("Line 430 status: %d, command : %d\n", status, command);
-    }
-
-    return command;
 }
 
 /*****************************************************************************/
@@ -328,74 +340,6 @@ uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
     // printf("Line 246 status: %d, command : %d\n", status, command);
 
     return command;
-}
-
-/*****************************************************************************/
-void cyclic_task()
-{
-    // receive process data
-
-    /** Fetches received frames from the hardware and processes the datagrams.
-     *
-     * Queries the network device for received frames by calling the interrupt
-     * service routine. Extracts received datagrams and dispatches the results to
-     * the datagram objects in the queue. Received datagrams, and the ones that
-     * timed out, will be marked, and dequeued.
-     *
-     * Has to be called cyclically by the realtime application after
-     * ecrt_master_activate() has returned.
-     */
-
-    ecrt_master_receive(master);
-
-    /** Determines the states of the domain's datagrams.
-     *
-     * Evaluates the working counters of the received datagrams and outputs
-     * statistics, if necessary. This must be called after ecrt_master_receive()
-     * is expected to receive the domain datagrams in order to make
-     * ecrt_domain_state() return the result of the last process data exchange.
-     */
-
-    // printf("line 331 \n");
-
-    ecrt_domain_process(domain);
-
-    // // check process data state
-    check_domain_state();
-
-    static uint16_t command = 0;
-    static uint16_t command1 = 0;
-    static uint16_t command2 = 0;
-
-    uint16_t status, status1, status2;
-    status = EC_READ_U16(domain_pd + offset.statusword);
-    status1 = EC_READ_U16(domain_pd + offset1.statusword);
-    status2 = EC_READ_U16(domain_pd + offset2.statusword);
-
-    // ************ update status and command for 1st Drive ************
-
-    // printf(" status : %d, pos_value: %d \n", status, act_pos);
-
-    command = make_ready_state(status, command, 0);
-    EC_WRITE_U16(domain_pd + offset.controlword, command);
-
-    // // ************ update status and command for 2nd Drive ************
-
-    // printf(" status1 : %d, pos_value: %d \n", status1, act_pos1);
-
-    command1 = make_ready_state(status1, command1, 1);
-    EC_WRITE_U16(domain_pd + offset1.controlword, command1);
-    
-
-    // // ************ update status and command for 3rd Drive ************
-
-    // printf(" status2 : %d, pos_value: %d \n", status2, act_pos2);
-
-    command2 = make_ready_state(status2, command2, 2);
-    EC_WRITE_U16(domain_pd + offset2.controlword, command2);
-
-    ecrt_domain_queue(domain);
-    ecrt_master_send(master);
 }
 
 /*****************************************************************************/
@@ -460,7 +404,6 @@ void cyclic_task()
     dio2 = EC_READ_U32(domain_pd + offset2.digital_input_value);
 
     data_ptr[8] = dio0;
-    data_ptr[9] = dio1;
     data_ptr[10] = dio2;
 
     data_ptr[11] = act_pos;
