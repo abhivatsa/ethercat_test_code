@@ -543,7 +543,7 @@ void pdo_mapping(ec_slave_config_t *sc)
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A00, 0x2600, 0, 32); /* 0x2600:0/32bits, Digital Input Value */ 
 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x6078, 0, 16); /* 0x6077:0/16bits, Current actual value */ 
-    ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x607C, 0, 32); /* 0x6077:0/16bits, Homing offset */ 
+    // ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x607C, 0, 32); /* 0x6077:0/16bits, Homing offset */ 
     ecrt_slave_config_pdo_mapping_add(sc, 0x1A01, 0x606C, 0, 32); /* 0x606C:0/32bits, velocity_actual_value */ 
 
 }
@@ -689,7 +689,7 @@ int main(int argc, char **argv)
     int shm_fd; 
 
     /* the size (in bytes) of shared memory object */
-    const int SIZE = sizeof(int[20]);
+    const int SIZE = sizeof(int[40]);
 
     /* create the shared memory object */
     shm_fd = shm_open("ethercat_data_exchange", O_CREAT | O_RDWR, 0666);

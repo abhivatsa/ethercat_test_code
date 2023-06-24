@@ -12,6 +12,7 @@
 
 /* pointer to shared memory object */
 int* ptr1;
+double* force_dim_ptr;
 
 int joint_torq_lim[3] = {200, 75, 200};
 
@@ -29,6 +30,8 @@ double conv_enc_to_pos(double pos){
 
 int compute_traj_kinematics (unsigned int joint_id, double desired_joint_acc, double desired_joint_vel, double ini_pos, double final_pos);
 
+int force_dim_to_instrument(int& joint1_pos, int& joint2_pos, int& joint3_pos);
+
 
 int main()
 {
@@ -45,10 +48,30 @@ int main()
     /* memory map the shared memory object */
     ptr1 = static_cast<int*> (mmap(0, SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, shm_fd, 0));
 
+    /* the size (in bytes) of shared memory object */
+    const double FORCE_DIM_SIZE = sizeof(double[20]);
+ 
+    /* shared memory file descriptor */
+    int shm_force_dim;
+ 
+    /* open the shared memory object */
+    shm_force_dim = shm_open("force_dim_data", O_CREAT | O_RDWR, 0666);
+
+    ftruncate(shm_force_dim, FORCE_DIM_SIZE);
+ 
+    /* memory map the shared memory object */
+    force_dim_ptr = static_cast<double*> (mmap(0, FORCE_DIM_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, shm_force_dim, 0));
+
     ptr1[0] = 1;
     ptr1[1] = 1;
     ptr1[2] = 1;
     ptr1[3] = 1;
+    ptr1[4] = 0;
+
+    force_dim_ptr[3] = 0;
+    force_dim_ptr[4] = 0;
+    force_dim_ptr[5] = 0;
+    force_dim_ptr[6] = 0;
 
     int sterile_adapter_attached = 1;
     int instrument_attached = 1;
@@ -128,14 +151,78 @@ int main()
     joint_2_pos_cnt = ptr1[14];
     joint_3_pos_cnt = ptr1[17];
 
-    while (instrument_attached == 0){
+
+
+    while (instrument_attached == 0 && ptr1[7] == 0){
         ptr1[13] = joint_1_pos_cnt + ptr1[4];
         ptr1[16] = joint_1_pos_cnt + ptr1[5];
         ptr1[19] = joint_1_pos_cnt + ptr1[6];
     }
 
+    sleep(1.0);
+
+    joint_1_pos_cnt = ptr1[11];
+    joint_2_pos_cnt = ptr1[14];
+    joint_3_pos_cnt = ptr1[17];
+
+    while(ptr1[7] == 1){
+        force_dim_to_instrument(joint_1_pos_cnt, joint_2_pos_cnt, joint_3_pos_cnt);
+    }
+
     return 0;
     
+}
+
+int force_dim_to_instrument(int& joint1_pos, int& joint2_pos, int& joint3_pos){
+
+    double pitch, yaw, roll, pinch;
+
+    int max_cnt = 200;
+    int time_freq = 1000;
+
+    if (fabs(force_dim_ptr[3]*1024*50/time_freq) > max_cnt){
+        roll = force_dim_ptr[3]/fabs(force_dim_ptr[3])*max_cnt;
+    }
+    else{
+        roll = force_dim_ptr[3]*1024*50/time_freq;
+    }
+
+    if (fabs(force_dim_ptr[4]*1024*2*50/time_freq) > 2*max_cnt){
+        pitch = force_dim_ptr[4]/fabs(force_dim_ptr[4])*2*max_cnt;
+    }
+    else{
+        pitch = force_dim_ptr[4]*1024*2*50/time_freq;
+    }
+
+    if (fabs(force_dim_ptr[5]*1024*2*50/time_freq) > 2*max_cnt){
+        yaw = force_dim_ptr[5]/fabs(force_dim_ptr[5])*2*max_cnt;
+    }
+    else{
+        yaw = force_dim_ptr[5]*1024*2*50/time_freq;
+    }
+
+    if (fabs(force_dim_ptr[6]*4096*50*2/time_freq) > 2*max_cnt){
+        pinch = -force_dim_ptr[6]/fabs(force_dim_ptr[6])*2*max_cnt;
+    }
+    else{
+        pinch = -force_dim_ptr[6]*4096*50*2/time_freq;
+    }
+
+    joint1_pos = joint1_pos - 0.7 * pitch + yaw - pinch;
+    joint2_pos = joint2_pos + pitch;
+    joint3_pos = joint3_pos - 0.7 * pitch + yaw + pinch;
+
+    // std::cout<<"joint1_pos : "<<joint1_pos<<", joint2_pos : "<<joint2_pos<<", joint3_pos : "<<joint3_pos<<std::endl;
+    // std::cout<<"pitch : "<<pitch<<", yaw : "<<yaw<<", pinch : "<<pinch<<std::endl;
+    // std::cout<<"pitch : "<<force_dim_ptr[4]<<", yaw : "<<force_dim_ptr[5]<<", pinch : "<<force_dim_ptr[6]<<std::endl;
+
+    ptr1[13] = joint1_pos;
+    ptr1[16] = joint2_pos;
+    ptr1[19] = joint3_pos;
+
+    usleep(1000);
+
+    return 0;
 }
 
 int compute_traj_kinematics (unsigned int joint_id, double desired_joint_acc, double desired_joint_vel, double ini_pos, double final_pos)

@@ -57,3 +57,11 @@ sudo g++ sterile_engagement.cpp -pthread -lrt -o sterile_engagement
 sudo ./a.out
 sudo ./sterile_engagement
 ```
+
+```
+sudo g++ sterile_engagement.cpp -pthread -lrt -o sterile_engagement
+sudo gcc novanta_drive_working.c -I/usr/local/include -Wall /usr/local/lib/libethercat.a -pthread -lrt
+sudo g++ websocket_server_async.cpp -pthread -lrt -o websocket_server_async -I ./include
+
+
+```
