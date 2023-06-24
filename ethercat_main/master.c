@@ -92,49 +92,6 @@ uint16_t update_state(uint16_t status, uint16_t command, int joint_num)
 
 /*****************************************************************************/
 
-uint16_t update_rfid_state(uint16_t status, uint16_t command)
-{
-    if ( ((status | 127) ^ 255) == 0 ){
-        printf("Tag Detected \n");
-        command = 64;
-    }
-    else if ( ((status | 191) ^ 255 ) == 0){
-        printf("Updated the data \n");
-        command = 4;
-    }
-    else if ( ((status | 191) ^ 191) == 0){  
-        printf("clear the data \n");
-        // Ready to Switch on
-        command = 7;
-    }
-    else if ( ((status | 65424) ^ 65459) == 0){
-        printf("RFID Drive Switched On \n");
-        // Switched On
-        command = 15;
-    }
-    else if ( ((status | 65424) ^ 65463) == 0 ){
-        // printf(" Operation Enabled \n");
-        // Operation Enabled
-    }
-    // else if ( ((status | 65424) ^ 65431) == 0){
-    //     printf("STS_QUICK_STOP_ACTIVE  \n");
-    // }
-    else if ( ((status | 65456) ^ 65471) == 0){
-        // Fault Reaction Active
-    }
-    else if ( ((status | 65456) ^ 65464) == 0 && command != 128){
-        // Fault
-        command = 128;
-    }
-    else{
-        // printf("Line 430 status: %d, command : %d\n", status, command);
-    }
-
-    return command;
-}
-
-/*****************************************************************************/
-
 void cyclic_task()
 {
     // receive process data
@@ -163,7 +120,7 @@ void cyclic_task()
     // printf("line 133 \n");
 
     ecrt_domain_process(domain1);
-    // ecrt_domain_process(domain2);
+    ecrt_domain_process(domain2);
 
     // // check process data state
     check_domain_state();
@@ -172,49 +129,61 @@ void cyclic_task()
     // printf("%lu \n", ecrt_domain_size(domain2));
 
 
-    static uint16_t command[3] = {0, 0, 0};
 
-    uint16_t status[3];
+    // ************ For Domain 1 **************
 
-    uint32_t dio[3];
+    int domain1_slave_cnt = 2;
+    static uint16_t domain1_command[1] = {0, 0};
+
+    uint16_t domain1_status[domain1_slave_cnt];
+
+    uint32_t domain1_dio[domain1_slave_cnt];
     
-    int act_pos[3];
-    int act_torq[3];
+    int domain1_act_pos[domain1_slave_cnt];
+    int domain1_act_torq[domain1_slave_cnt];
 
-    for (int jnt_ctr = 0; jnt_ctr < 3; jnt_ctr++){
-        status[jnt_ctr] = EC_READ_U16(domain1_pd + offset[jnt_ctr].statusword);
-        act_pos[jnt_ctr] = EC_READ_S32(domain1_pd + offset[jnt_ctr].position_actual_value);
-        act_torq[jnt_ctr] = EC_READ_S16(domain1_pd + offset[jnt_ctr].torque_actual_value);
-        dio[jnt_ctr] = EC_READ_U32(domain1_pd + offset[jnt_ctr].digital_input_value);
+    for (int jnt_ctr = 0; jnt_ctr < domain1_slave_cnt; jnt_ctr++){
+        // printf("1st joint \n");
+        domain1_status[jnt_ctr] = EC_READ_U16(domain1_pd + d1_offset[jnt_ctr].statusword);
+        domain1_act_pos[jnt_ctr] = EC_READ_S32(domain1_pd + d1_offset[jnt_ctr].position_actual_value);
+        domain1_act_torq[jnt_ctr] = EC_READ_S16(domain1_pd + d1_offset[jnt_ctr].torque_actual_value);
+        domain1_dio[jnt_ctr] = EC_READ_U32(domain1_pd + d1_offset[jnt_ctr].digital_input_value);
 
-        command[jnt_ctr] = update_state(status[jnt_ctr], command[jnt_ctr], 0);
+        domain1_command[jnt_ctr] = update_state(domain1_status[jnt_ctr], domain1_command[jnt_ctr], 0);
 
-        EC_WRITE_U16(domain1_pd + offset[jnt_ctr].controlword, command[jnt_ctr]);
-        EC_WRITE_S8(domain1_pd + offset[jnt_ctr].modes_of_operation, 8);
-        EC_WRITE_S32(domain1_pd + offset[jnt_ctr].target_position, 200000);
+        EC_WRITE_U16(domain1_pd + d1_offset[jnt_ctr].controlword, domain1_command[jnt_ctr]);
+        EC_WRITE_S8(domain1_pd + d1_offset[jnt_ctr].modes_of_operation, 8);
+        EC_WRITE_S32(domain1_pd + d1_offset[jnt_ctr].target_position, 200000);
     }
 
-    uint8_t status_rfid, instrument_type_rfid, instrument_ver_rfid;
-    static uint8_t command_rfid = 0;
+    // *************** For Domain 2 ***************
+    int domain2_slave_cnt = 1;
+    static uint16_t domain2_command[1] = {0};
 
-    printf("line 212 \n");
-    status_rfid = EC_READ_S8(domain1_pd + offset_rfid.statusword);
-    printf("line 214 \n");
-    printf("%d \n", status_rfid);
-    if ( ((status_rfid | 127) ^ 255) == 0 ){
-        printf("Tag Detected \n");
-        command_rfid = 64;
-        EC_WRITE_U8(domain1_pd + offset_rfid.controlword, command_rfid);
+    uint16_t domain2_status[domain2_slave_cnt];
+
+    uint32_t domain2_dio[domain2_slave_cnt];
+    
+    int domain2_act_pos[domain2_slave_cnt];
+    int domain2_act_torq[domain2_slave_cnt];
+
+    for (int jnt_ctr = 0; jnt_ctr < 1; jnt_ctr++){
+        // printf("3rd joint \n");
+        domain2_status[jnt_ctr] = EC_READ_U16(domain2_pd + d2_offset[jnt_ctr].statusword);
+        domain2_act_pos[jnt_ctr] = EC_READ_S32(domain2_pd + d2_offset[jnt_ctr].position_actual_value);
+        domain2_act_torq[jnt_ctr] = EC_READ_S16(domain2_pd + d2_offset[jnt_ctr].torque_actual_value);
+        domain2_dio[jnt_ctr] = EC_READ_U32(domain2_pd + d2_offset[jnt_ctr].digital_input_value);
+
+        domain2_command[jnt_ctr] = update_state(domain2_status[jnt_ctr], domain2_command[jnt_ctr], 0);
+
+        EC_WRITE_U16(domain2_pd + d2_offset[jnt_ctr].controlword, domain2_command[jnt_ctr]);
+        EC_WRITE_S8(domain2_pd + d2_offset[jnt_ctr].modes_of_operation, 8);
+        EC_WRITE_S32(domain2_pd + d2_offset[jnt_ctr].target_position, 200000);
     }
 
-    if (command_rfid == 64){
-        instrument_type_rfid = EC_READ_U8(domain1_pd + offset_rfid.instrument_type);
-        instrument_ver_rfid = EC_READ_U16(domain1_pd + offset_rfid.instrument_version);
-        printf("%d \n", instrument_type_rfid);
-    }
 
     ecrt_domain_queue(domain1);
-    // ecrt_domain_queue(domain2);
+    ecrt_domain_queue(domain2);
     ecrt_master_send(master);
 }
 
@@ -283,9 +252,10 @@ void pdo_mapping(ec_slave_config_t *sc)
 
 int main(int argc, char **argv)
 {
-    // ec_slave_config_t *sc, *sc1, *sc2;
     struct timespec wakeup_time;
     int ret = 0;
+
+    int local_pos = 0;
 
     // Retrieving Master
 
@@ -314,7 +284,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    for (int jnt_ctr = 0; jnt_ctr < 3; jnt_ctr++)
+    for (int jnt_ctr = 0; jnt_ctr < 2; jnt_ctr++)
     {
         ec_slave_config_t *sc;
 
@@ -344,18 +314,18 @@ int main(int argc, char **argv)
         ec_pdo_entry_reg_t domain_regs[] = {
     
             // --------------------- denalli_xcr_pos0 ------------------------ 
-            {0, jnt_ctr, denalli_xcr, 0x6041, 0, &offset[jnt_ctr].statusword},             // 6041 0 statusword
-            {0, jnt_ctr, denalli_xcr, 0x6064, 0, &offset[jnt_ctr].position_actual_value},  // 6064 0 pos_act_val
-            {0, jnt_ctr, denalli_xcr, 0x6077, 0, &offset[jnt_ctr].torque_actual_value},    // 6077 0 torq_act_val
-            {0, jnt_ctr, denalli_xcr, 0x2600, 0, &offset[jnt_ctr].digital_input_value},    // 2600 0 digital_input_value
-            {0, jnt_ctr, denalli_xcr, 0x6078, 0, &offset[jnt_ctr].current_actual_value},   // 6078 0 current_actual_value
-            {0, jnt_ctr, denalli_xcr, 0x606C, 0, &offset[jnt_ctr].velocity_actual_value},  // 606C 0 vel_act_val
-            {0, jnt_ctr, denalli_xcr, 0x607C, 0, &offset[jnt_ctr].homing_offset},
-            {0, jnt_ctr, denalli_xcr, 0x6040, 0, &offset[jnt_ctr].controlword},            // 6040 0 control word
-            {0, jnt_ctr, denalli_xcr, 0x6060, 0, &offset[jnt_ctr].modes_of_operation},     // 6060 0 mode_of_operation
-            {0, jnt_ctr, denalli_xcr, 0x607A, 0, &offset[jnt_ctr].target_position},        // 607A 0 target position
-            {0, jnt_ctr, denalli_xcr, 0x60FF, 0, &offset[jnt_ctr].target_velocity},        // 60FF 0 target velocity
-            {0, jnt_ctr, denalli_xcr, 0x6071, 0, &offset[jnt_ctr].target_torque},          // 6071 0 target torque
+            {0, jnt_ctr, denalli_xcr, 0x6041, 0, &d1_offset[jnt_ctr-local_pos].statusword},             // 6041 0 statusword
+            {0, jnt_ctr, denalli_xcr, 0x6064, 0, &d1_offset[jnt_ctr-local_pos].position_actual_value},  // 6064 0 pos_act_val
+            {0, jnt_ctr, denalli_xcr, 0x6077, 0, &d1_offset[jnt_ctr-local_pos].torque_actual_value},    // 6077 0 torq_act_val
+            {0, jnt_ctr, denalli_xcr, 0x2600, 0, &d1_offset[jnt_ctr-local_pos].digital_input_value},    // 2600 0 digital_input_value
+            {0, jnt_ctr, denalli_xcr, 0x6078, 0, &d1_offset[jnt_ctr-local_pos].current_actual_value},   // 6078 0 current_actual_value
+            {0, jnt_ctr, denalli_xcr, 0x606C, 0, &d1_offset[jnt_ctr-local_pos].velocity_actual_value},  // 606C 0 vel_act_val
+            {0, jnt_ctr, denalli_xcr, 0x607C, 0, &d1_offset[jnt_ctr-local_pos].homing_offset},
+            {0, jnt_ctr, denalli_xcr, 0x6040, 0, &d1_offset[jnt_ctr-local_pos].controlword},            // 6040 0 control word
+            {0, jnt_ctr, denalli_xcr, 0x6060, 0, &d1_offset[jnt_ctr-local_pos].modes_of_operation},     // 6060 0 mode_of_operation
+            {0, jnt_ctr, denalli_xcr, 0x607A, 0, &d1_offset[jnt_ctr-local_pos].target_position},        // 607A 0 target position
+            {0, jnt_ctr, denalli_xcr, 0x60FF, 0, &d1_offset[jnt_ctr-local_pos].target_velocity},        // 60FF 0 target velocity
+            {0, jnt_ctr, denalli_xcr, 0x6071, 0, &d1_offset[jnt_ctr-local_pos].target_torque},          // 6071 0 target torque
             {}
 
         };
@@ -380,53 +350,81 @@ int main(int argc, char **argv)
         
     }
 
-    // domain2 = ecrt_master_create_domain(master);
-    // if (!domain2)
-    // {
-    //     return -1;
-    // }
-
-    ec_slave_config_t *sc;
-
-    if (!(sc = ecrt_master_slave_config(
-            master, 0, 4, inhouse_slave)))
+    domain2 = ecrt_master_create_domain(master);
+    if (!domain2)
     {
-        fprintf(stderr, "Failed to get slave configuration.\n");
         return -1;
     }
 
-    ecrt_slave_config_pdos(sc, EC_END, slave_rfid_syncs);
+    local_pos = 2;
 
-    ec_pdo_entry_reg_t domain_regs[] = {
-
-        // --------------------- denalli_xcr_pos0 ------------------------ 
-        {0, 4, inhouse_slave, 0x6000, 0x01, &offset_rfid.statusword},             // 6041 0 statusword
-        {0, 4, inhouse_slave, 0x7000, 0x01, &offset_rfid.controlword},  // 6064 0 pos_act_val
-        {0, 4, inhouse_slave, 0x6000, 0x03, &offset_rfid.instrument_type},    // 6077 0 torq_act_val
-        {0, 4, inhouse_slave, 0x6000, 0x05, &offset_rfid.instrument_version},    // 6077 0 torq_act_val
-        {}
-
-    };
-
-    /** Registers a bunch of PDO entries for a domain.
-     *
-     * This method has to be called in non-realtime context before
-     * ecrt_master_activate().
-     *
-     * \see ecrt_slave_config_reg_pdo_entry()
-     *
-     * \attention The registration array has to be terminated with an empty
-     *            structure, or one with the \a index field set to zero!
-     * \return 0 on success, else non-zero.
-     */
-
-    printf("Domain register before...\n");
-
-    if (ecrt_domain_reg_pdo_entry_list(domain1, domain_regs))
+    for (int jnt_ctr = 2; jnt_ctr < 3; jnt_ctr++)
     {
-        fprintf(stderr, "PDO entry registration failed!\n");
-        return -1;
+        ec_slave_config_t *sc;
+
+        if (!(sc = ecrt_master_slave_config(
+                master, 0, jnt_ctr, denalli_xcr)))
+        {
+            fprintf(stderr, "Failed to get slave configuration.\n");
+            return -1;
+        }
+
+        // ec_sdo_request_t *sdo_req;
+
+        // if (!(sdo_req = ecrt_slave_config_create_sdo_request(sc, 0x6064, 0, 32)))
+        // {
+        //     fprintf(stderr, "Failed to create SDO request.\n");
+        //     return -1;
+        // }
+
+        // ecrt_sdo_request_timeout(sdo_req, 10000);
+
+        // int value_chk = EC_READ_S32(ecrt_sdo_request_data(sdo_req));
+
+        // printf("line 277 : %d \n", value_chk);
+
+        pdo_mapping(sc);     
+
+        ec_pdo_entry_reg_t domain_regs[] = {
+    
+            // --------------------- denalli_xcr_pos0 ------------------------ 
+            {0, jnt_ctr, denalli_xcr, 0x6041, 0, &d2_offset[jnt_ctr-local_pos].statusword},             // 6041 0 statusword
+            {0, jnt_ctr, denalli_xcr, 0x6064, 0, &d2_offset[jnt_ctr-local_pos].position_actual_value},  // 6064 0 pos_act_val
+            {0, jnt_ctr, denalli_xcr, 0x6077, 0, &d2_offset[jnt_ctr-local_pos].torque_actual_value},    // 6077 0 torq_act_val
+            {0, jnt_ctr, denalli_xcr, 0x2600, 0, &d2_offset[jnt_ctr-local_pos].digital_input_value},    // 2600 0 digital_input_value
+            {0, jnt_ctr, denalli_xcr, 0x6078, 0, &d2_offset[jnt_ctr-local_pos].current_actual_value},   // 6078 0 current_actual_value
+            {0, jnt_ctr, denalli_xcr, 0x606C, 0, &d2_offset[jnt_ctr-local_pos].velocity_actual_value},  // 606C 0 vel_act_val
+            {0, jnt_ctr, denalli_xcr, 0x607C, 0, &d2_offset[jnt_ctr-local_pos].homing_offset},
+            {0, jnt_ctr, denalli_xcr, 0x6040, 0, &d2_offset[jnt_ctr-local_pos].controlword},            // 6040 0 control word
+            {0, jnt_ctr, denalli_xcr, 0x6060, 0, &d2_offset[jnt_ctr-local_pos].modes_of_operation},     // 6060 0 mode_of_operation
+            {0, jnt_ctr, denalli_xcr, 0x607A, 0, &d2_offset[jnt_ctr-local_pos].target_position},        // 607A 0 target position
+            {0, jnt_ctr, denalli_xcr, 0x60FF, 0, &d2_offset[jnt_ctr-local_pos].target_velocity},        // 60FF 0 target velocity
+            {0, jnt_ctr, denalli_xcr, 0x6071, 0, &d2_offset[jnt_ctr-local_pos].target_torque},          // 6071 0 target torque
+            {}
+
+        };
+
+        /** Registers a bunch of PDO entries for a domain.
+         *
+         * This method has to be called in non-realtime context before
+         * ecrt_master_activate().
+         *
+         * \see ecrt_slave_config_reg_pdo_entry()
+         *
+         * \attention The registration array has to be terminated with an empty
+         *            structure, or one with the \a index field set to zero!
+         * \return 0 on success, else non-zero.
+         */
+
+        if (ecrt_domain_reg_pdo_entry_list(domain2, domain_regs))
+        {
+            fprintf(stderr, "PDO entry registration failed!\n");
+            return -1;
+        }
+        
     }
+
+
 
     printf("Activating master...\n");
     if (ecrt_master_activate(master))
@@ -451,6 +449,11 @@ int main(int argc, char **argv)
     printf("line 661 \n");
 
     if (!(domain1_pd = ecrt_domain_data(domain1)))
+    {
+        return -1;
+    }
+
+    if (!(domain2_pd = ecrt_domain_data(domain2)))
     {
         return -1;
     }

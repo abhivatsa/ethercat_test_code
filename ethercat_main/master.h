@@ -75,9 +75,6 @@ static ec_domain_state_t domain1_state = {};
 static ec_domain_t *domain2 = NULL;
 static ec_domain_state_t domain2_state = {};
 
-static ec_slave_config_t *sc_ana_in = NULL;
-static ec_slave_config_state_t sc_ana_in_state = {};
-
 // process data
 static uint8_t *domain1_pd = NULL;
 static uint8_t *domain2_pd = NULL;
@@ -105,65 +102,4 @@ struct joint_pdos
     unsigned int target_position;
     unsigned int target_velocity;
     unsigned int target_torque;
-} offset[3];
-
-
-struct rfid_slave
-{
-    // uint8_t statusword;
-    // uint8_t controlword;
-    // uint8_t instrument_type;
-    // uint16_t instrument_version;
-    unsigned int statusword;
-    unsigned int controlword;
-    unsigned int instrument_type;
-    unsigned int instrument_version;
-} offset_rfid; 
-
-/* Master 0, Slave 3, "PIC32 EtherCAT Slave"
- * Vendor ID:       0x0000007b
- * Product code:    0x00009252
- * Revision number: 0x00000001
- */
-
-ec_pdo_entry_info_t slave_rfid_pdo_entries[] = {
-    {0x7000, 0x01, 8}, /* Control_word */
-    {0x7000, 0x02, 8}, /* Header */
-    {0x7000, 0x03, 16}, /*  Used_hsptl_code */
-    {0x7000, 0x04, 8}, /* Number_of_usage */
-    {0x7000, 0x05, 8}, /* Last_used_Date */
-    {0x7000, 0x06, 8}, /* Last_used_Month */
-    {0x7000, 0x07, 8}, /* Last_used_Year */
-    {0x7000, 0x08, 8}, /* Last_used_Hour */
-    {0x6000, 0x01, 8}, /* Status_word */
-    {0x6000, 0x02, 8}, /* Header */
-    {0x6000, 0x03, 8}, /* Instrument_type */
-    {0x6000, 0x04, 8}, /* Usage_limit */
-    {0x6000, 0x05, 16}, /* Instrument_version */
-    {0x6000, 0x06, 8}, /* Mfg_Country_code */
-    {0x6000, 0x07, 8}, /* Mfg_Plant_code */
-    {0x6000, 0x08, 8}, /* Mfg_Date */
-    {0x6000, 0x09, 8}, /* Mfg_Month */
-    {0x6000, 0x10, 8}, /* Mfg_year */
-    {0x6000, 0x11, 8}, /* QC_Status */
-    {0x6000, 0x12, 16}, /*  Used_hsptl_code */
-    {0x6000, 0x13, 8}, /* Number_of_usage */
-    {0x6000, 0x14, 8}, /* Last_used_Date */
-    {0x6000, 0x15, 8}, /* Last_used_Month */
-    {0x6000, 0x16, 8}, /* Last_used_Year */
-    {0x6000, 0x17, 8}, /* Last_used_Hour */
-};
-
-ec_pdo_info_t slave_rfid_pdos[] = {
-    {0x1600, 8, slave_rfid_pdo_entries + 0}, /* Output mapping 0 */
-    {0x1a00, 17, slave_rfid_pdo_entries + 8}, /* Input mapping 0 */
-};
-
-ec_sync_info_t slave_rfid_syncs[] = {
-    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
-    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
-    {2, EC_DIR_OUTPUT, 1, slave_rfid_pdos + 0, EC_WD_ENABLE},
-    {3, EC_DIR_INPUT, 1, slave_rfid_pdos + 1, EC_WD_DISABLE},
-    {0xff}
-};
-
+} d1_offset[2], d2_offset[1];
